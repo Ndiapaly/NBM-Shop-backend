@@ -85,10 +85,7 @@ app._router.stack.forEach(function(r){
 });
 
 // Connexion à MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('✅ Connexion MongoDB réussie'))
 .catch((err) => console.error('❌ Erreur de connexion MongoDB:', err));
 
