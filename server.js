@@ -55,7 +55,7 @@ app.use((req, res, next) => {
 
 // Middlewares
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5000'], 
+  origin: ['http://localhost:3000', 'http://localhost:10000'], 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
   allowedHeaders: ['Content-Type', 'Authorization'], 
   credentials: true 
