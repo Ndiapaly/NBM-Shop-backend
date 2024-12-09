@@ -11,6 +11,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+app.get('/', (req, res) => {
+  res.send('Bienvenue sur l\'API!');
+});
 // Configuration du proxy
 app.set('trust proxy', true);  // Ajouter cette ligne pour gérer correctement les en-têtes proxy
 
