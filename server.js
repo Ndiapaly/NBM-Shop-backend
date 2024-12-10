@@ -58,7 +58,7 @@ app.use((req, res, next) => {
 
 // Middlewares
 app.use(cors({
-  origin: ['https://nbm-shop-jacob-ndiapaly.vercel.app/', 'https://nbm-shop-backend-5.onrender.com'], 
+  origin: ['http://localhost:3000', 'https://locallhost:10000'], 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
   allowedHeaders: ['Content-Type', 'Authorization'], 
   credentials: true 
