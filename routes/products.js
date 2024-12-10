@@ -44,6 +44,14 @@ const upload = multer({
 // @access  Privé/Admin
 router.post('/', [auth, admin, upload.array('images', 5)], async (req, res) => {
   try {
+    console.log('Requête reçue pour créer un produit :', { 
+      name: req.body.name, 
+      description: req.body.description, 
+      price: req.body.price, 
+      sizes: req.body.sizes, 
+      category: req.body.category, 
+      brand: req.body.brand 
+    });
     const { 
       name, 
       description, 
@@ -86,8 +94,10 @@ router.post('/', [auth, admin, upload.array('images', 5)], async (req, res) => {
 // @route   GET /api/produits
 // @desc    Récupérer tous les produits
 // @access  Public
+console.log('Requête reçue pour récupérer tous les produits');
 router.get('/', async (req, res) => {
   try {
+    console.log('Requête reçue pour récupérer tous les produits');
     const { 
       page = 1, 
       limit = 10, 
@@ -175,6 +185,7 @@ router.get('/all', async (req, res) => {
 router.get('/search', async (req, res) => {
   try {
     const { q } = req.query;
+    console.log('Requête de recherche de produits :', { q });
     const products = await Product.find({
       $or: [
         { name: { $regex: q, $options: 'i' } },
