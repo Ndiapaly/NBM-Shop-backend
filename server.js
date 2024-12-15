@@ -1,21 +1,18 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const path = require('path');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const path = require("path");
 
 // Configuration
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-app.get('/', (req, res) => {
-  res.send('Bienvenue sur l\'API!');
-});
 // Configuration du proxy
-app.set('trust proxy', true);  // Ajouter cette ligne pour gérer correctement les en-têtes proxy
+app.set("trust proxy", false); // Désactiver si pas de proxy ou inconnu
 
 // Sécurité : Middleware Helmet
 app.use(helmet());
@@ -24,81 +21,65 @@ app.use(helmet());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limite 100 requêtes par IP
-  message: 'Trop de requêtes, réessayez plus tard',
-  standardHeaders: true, 
+  message: "Trop de requêtes, réessayez plus tard",
+  standardHeaders: true,
   legacyHeaders: false,
-  trustProxy: false // Désactiver le trust proxy pour le rate limiter
+  trustProxy: false, // Correspond à la configuration de Express
 });
 app.use(limiter);
 
-// Middleware de débogage
-app.use((req, res, next) => {
-  console.log(`[DEBUG] Requête reçue : ${req.method} ${req.path}`);
-  console.log('Headers :', req.headers);
-  console.log('Body :', req.body);
-  next();
-});
+// ... le reste de votre code reste inchangé ...
 
-// Middleware de débogage des routes
-app.use((req, res, next) => {
-  console.log(`[ROUTE DEBUG] Requête reçue : ${req.method} ${req.path}`);
-  console.log('Headers :', req.headers);
-  console.log('Body :', req.body);
-  console.log('Query :', req.query);
-  
-  // Liste des routes enregistrées
-  const routes = app._router.stack
-    .filter(r => r.route)
-    .map(r => `${Object.keys(r.route.methods).join(', ').toUpperCase()} ${r.route.path}`);
-  
-  console.log('Routes disponibles :', routes);
-  
-  next();
-});
-
-// Middlewares
-app.use(cors({
-  origin: ['https://vercel.com/ndiapalys-projects/nbm-shop-client/A1DkXjHRa9ivsro66PNchEMFqHiq', 'https://nbm-shop-backend-5.onrender.com'], 
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
-  allowedHeaders: ['Content-Type', 'Authorization'], 
-  credentials: true 
-}));
+// Middleware pour le parsing du JSON et URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware CORS
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:10000"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+}));
+
 // Routes
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
-const orderRoutes = require('./routes/orders');
-const wishlistRoutes = require('./routes/wishlist');
-const contactRoutes = require('./routes/contact');  
+const authRoutes = require("./routes/auth");
+const productRoutes = require("./routes/products");
+const orderRoutes = require("./routes/orders");
+const wishlistRoutes = require("./routes/wishlist");
+const contactRoutes = require("./routes/contact");
 
-app.use('/api/auth', authRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/wishlist', wishlistRoutes);
-app.use('/api/contact', contactRoutes);  
-app.use('/api/produits', productRoutes);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes); // Ajoutez cette ligne si elle n'existait pas
+app.use("/api/orders", orderRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/contact", contactRoutes);
 
-// Afficher toutes les routes au démarrage
-app._router.stack.forEach(function(r){
-  if (r.route && r.route.path){
-    console.log(`Route: ${Object.keys(r.route.methods).join(', ').toUpperCase()} ${r.route.path}`);
-  }
+// Exemple de route pour GET /api/products avec pagination
+// Assurez-vous que ce code est dans votre fichier routes/products.js
+// Si ce n'est pas le cas, créez ce fichier ou modifiez-le selon votre structure
+
+// Middleware de débogage (optionnel, pour vérifier que les requêtes arrivent)
+app.use((req, res, next) => {
+  console.log(`[DEBUG] Requête reçue : ${req.method} ${req.path}`);
+  console.log("Headers :", req.headers);
+  console.log("Query :", req.query);
+  next();
 });
 
 // Connexion à MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log('✅ Connexion MongoDB réussie'))
-.catch((err) => console.error('❌ Erreur de connexion MongoDB:', err));
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("✅ Connexion MongoDB réussie"))
+  .catch((err) => console.error("❌ Erreur de connexion MongoDB:", err));
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Quelque chose s\'est mal passé !');
+  res.status(500).send("Quelque chose s'est mal passé !");
 });
 
 // Démarrage du serveur
 app.listen(PORT, () => {
-  console.log(`🚀 Serveur démarré sur le port ${PORT}`);
+  console.log(`🚀 Serveur démarré sur le port http://localhost:${PORT}`);
 });
