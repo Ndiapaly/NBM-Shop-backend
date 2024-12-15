@@ -13,7 +13,9 @@ const PORT = process.env.PORT || 10000;
 
 // Configuration du proxy
 app.set("trust proxy", false); // Désactiver si pas de proxy ou inconnu
-
+app.get('/', (req, res) => {
+  res.send('Bienvenue sur mon API!');
+});
 // Sécurité : Middleware Helmet
 app.use(helmet());
 
